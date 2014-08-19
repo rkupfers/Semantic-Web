@@ -1,0 +1,48 @@
+In OntoWiki:
+
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+PREFIX ns0: <http://www.semanticweb.org/u410/ontologies/2014/5/music#>
+PREFIX vcard: <http://www.w3.org/2001/vcard-rdf/3.0#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX owl: <http://www.w3.org/2002/07/owl#>
+PREFIX sysont: <http://ns.ontowiki.net/SysOnt/>
+select distinct ?artistName ?name ?charplacement ?genre ?year
+where{ 
+?album ns0:chartplacement ?charplacement.
+Filter(xsd:decimal(?charplacement) < 10).
+?album ns0:hasName ?name.
+Filter(?name != "Greatest Hits").
+?album ns0:year ?year.
+Filter(xsd:decimal(?year) > 2000).
+?artist ns0:hasAlbum ?album.
+?artist ns0:hasName ?artistName.
+?artist ns0:hasGenre ?genre
+     } 
+LIMIT 1000
+order by ?artistName
+
+Dbpedia: Artist mit genre
+	select ?s dbpprop:genre ?o where 
+	{?s dbpprop:genre ?o.
+	 Filter( contains(str(?o),"rock"))
+	} 
+
+LIMIT 100
+Anz:
+	select count(?s) 
+	{?s dbpprop:genre ?o.
+	 Filter( contains(str(?o),"rock"))
+	} 
+	LIMIT 10
+	
+select ?artist ?genre
+{
+ ?artist dbpprop:genre ?genre.
+ Filter( contains(str(?genre),"rock")).
+ filter EXISTS (?artist dbpedia-owl:background ?back)
+} 
+LIMIT 100
+
+Link:
+http://dbpedia.org/sparql?default-graph-uri=http%3A%2F%2Fdbpedia.org&query=select+distinct+%3Fartist+%3Fgenre%0D%0A%7B%0D%0A+%3Fartist+dbpprop%3Agenre+%3Fgenre.%0D%0A+Filter%28+contains%28str%28%3Fgenre%29%2C%22rock%22%29+%29.%0D%0A%7D+%0D%0Aoffset+100%0D%0ALIMIT+100&format=application%2Fsparql-results%2Bjson&timeout=30000&debug=on
